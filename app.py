@@ -1,21 +1,20 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for
+from models import Jogo, Usuario
+from dao import JogoDao
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
 app.secret_key = 'santana'
 
+app.config['MYSQL_HOST'] = "0.0.0.0"
+app.config['MYSQL_USER'] = "root"
+app.config['MYSQL_PASSWORD'] = "SENHAAQUI"
+app.config['MYSQL_DB'] = "jogoteca"
+app.config['MYSQL_PORT'] = "3306"
 
-class Jogo:
-    def __init__(self, nome, categoria, console):
-        self.nome = nome
-        self.categoria = categoria
-        self.console = console
+db = MySQL(app)
 
-
-class Usuario:
-    def __init__(self, id, nome, senha):
-        self.id = id
-        self.nome = nome
-        self.senha = senha
+jogo_dao = JogoDao(db)
 
 
 usuario1 = Usuario('luan', 'Luan Marques', '1234')
@@ -50,7 +49,7 @@ def criar():
     categoria = request.form['categoria']
     console = request.form['console']
     jogo = Jogo(nome, categoria, console)
-    lista.append(jogo)
+    jogo_dao.salvar(jogo)
     return redirect(url_for('index'))
 
 
@@ -85,4 +84,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
