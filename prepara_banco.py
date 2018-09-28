@@ -1,12 +1,12 @@
 import MySQLdb
 print('Conectando...')
-conn = MySQLdb.connect(user='root', passwd='SENHAAQUI', host='127.0.0.1', port=3306)
+conn = MySQLdb.connect(user='root', passwd='santanaroot', host='localhost', port=3306)
 
 # Descomente se quiser desfazer o banco...
 conn.cursor().execute("DROP DATABASE `jogoteca`;")
 conn.commit()
 
-criar_tabelas = '''SET NAMES utf8;
+criar_tabelas = '''SET NAMES latin1;
     CREATE DATABASE `jogoteca` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
     USE `jogoteca`;
     CREATE TABLE `jogo` (
@@ -53,7 +53,7 @@ cursor.executemany(
       ])
 
 cursor.execute('select * from jogoteca.jogo')
-print(' -------------  Jogos:  -------------')
+print('-------------  Jogos:  -------------')
 for jogo in cursor.fetchall():
     print(jogo[1])
 

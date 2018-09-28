@@ -8,9 +8,9 @@ app.secret_key = 'santana'
 
 app.config['MYSQL_HOST'] = "0.0.0.0"
 app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "SENHAAQUI"
+app.config['MYSQL_PASSWORD'] = "santanaroot"
 app.config['MYSQL_DB'] = "jogoteca"
-app.config['MYSQL_PORT'] = "3306"
+app.config['MYSQL_PORT'] = 3306
 
 db = MySQL(app)
 
@@ -33,6 +33,7 @@ lista = [jogo1, jogo2, jogo3]
 
 @app.route('/')
 def index():
+    lista = jogo_dao.listar()
     return render_template('lista.html', titulo='Jogos', jogos=lista)
 
 
