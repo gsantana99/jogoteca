@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_from_directory
 from models import Jogo, Usuario
 from dao import JogoDao, UsuarioDao
 from flask_mysqldb import MySQL
+import os
 
 app = Flask(__name__)
 app.secret_key = 'santana'
@@ -11,6 +12,7 @@ app.config['MYSQL_USER'] = "root"
 app.config['MYSQL_PASSWORD'] = "santanaroot"
 app.config['MYSQL_DB'] = "jogoteca"
 app.config['MYSQL_PORT'] = 3306
+app.config['UPLOAD_PATH'] = os.path.dirname(os.path.abspath(__file__)) + '/uploads'
 
 db = MySQL(app)
 
@@ -38,6 +40,9 @@ def criar():
     console = request.form['console']
     jogo = Jogo(nome, categoria, console)
     jogo_dao.salvar(jogo)
+    upload_path = app.config['UPLOAD_PATH']
+    arquivo = request.files['arquivo']
+    arquivo.save(f'{upload_path}/capa{jogo.id}.jpg')
     return redirect(url_for('index'))
 
 
@@ -46,7 +51,8 @@ def editar(id):
     if 'usuario_logado' not in session or session['usuario_logado'] == None:
         return redirect(url_for('login', proxima=None))
     jogo = jogo_dao.busca_por_id(id)
-    return render_template('editar.html', titulo='Editando jogo', jogo=jogo)
+    capa_jogo = f'capa{id}.jpg'
+    return render_template('editar.html', titulo='Editando jogo', jogo=jogo, capa_jogo=capa_jogo)
 
 
 @app.route('/atualizar', methods=['POST',])
@@ -61,6 +67,8 @@ def atualizar():
 
 @app.route('/deletar/<int:id>')
 def deletar(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        return redirect(url_for('login', proxima=None))
     jogo_dao.deletar(id)
     return redirect(url_for('index'))
     flash('O jogo foi removido com sucesso.')
@@ -94,6 +102,11 @@ def logout():
     session['usuario_logado'] = None
     flash('Nenhum usuario logado.')
     return redirect(url_for('index'))
+
+
+@app.route('/uploads/<nome_arquivo>')
+def imagem(nome_arquivo):
+    return send_from_directory('uploads', nome_arquivo)
 
 
 if __name__ == '__main__':
